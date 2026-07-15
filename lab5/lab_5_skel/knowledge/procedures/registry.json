@@ -1,0 +1,14 @@
+[
+  {
+    "id": "support_procedure",
+    "name": "Support Procedure",
+    "description": "General support procedure for user assistance.",
+    "always_load": false
+  },
+  {
+    "id": "emplayee_handbook",
+    "name": "Employee Handbook",
+    "description": "Guide for employee policies and procedures.",
+    "always_load": false
+  }
+]

@@ -2,6 +2,8 @@
 The agent coordinates communication between
 the conversation context and the language model."""
 
+import json
+
 
 class Agent:
     def __init__(self, llm_client, context, tools=None):
@@ -18,7 +20,7 @@ class Agent:
 
             tool = self.tools.get(tool_name)
             if tool:
-                result = tool.callback(**arguments)
+                result = tool.callback(**json.loads(arguments))
             else:
                 result = f"Tool '{tool_name}' not found"
 

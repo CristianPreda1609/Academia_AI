@@ -1,5 +1,12 @@
-from .lucky_number_tool import lucky_number_tool
+# TODO: Import your tools here
+
+try:
+    from . import lucky_number_tool as lnt
+except ImportError:
+    import lucky_number_tool as lnt
+
 
 tools = [
-    lucky_number_tool
+    # TODO: Add your tool instances here
+    lnt.lucky_number_tool
 ]

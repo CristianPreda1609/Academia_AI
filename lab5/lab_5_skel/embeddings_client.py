@@ -1,16 +1,24 @@
 import requests
 
-from config import EMBEDDINGS_MODEL, EMBEDDINGS_ENDPOINT
+from config import EMBEDDINGS_MODEL, EMBEDDINGS_ENDPOINT, API_KEY
 
 
 class EmbeddingsClient:
+    def _headers(self):
+        headers = {"Content-Type": "application/json"}
+        if "azure.com" in EMBEDDINGS_ENDPOINT:
+            headers["api-key"] = API_KEY
+        else:
+            headers["Authorization"] = f"Bearer {API_KEY}"
+        return headers
     def get_embedding(self, text: str) -> list[float]:
         response = requests.post(
             EMBEDDINGS_ENDPOINT,
             json={
                 "model": EMBEDDINGS_MODEL,
                 "input": text
-            }
+            },
+            headers=self._headers()
         )
 
         if not response.ok:

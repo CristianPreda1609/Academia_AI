@@ -1,0 +1,8 @@
+[
+  {
+    "id": "company_facts",
+    "name": "Company Facts",
+    "description": "Permanent company information.",
+    "always_load": true
+  }
+]

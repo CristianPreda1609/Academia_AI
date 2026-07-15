@@ -11,10 +11,12 @@ Future exercises may extend this file with:
 - Logging configuration
 """
 
-MODEL_NAME = "qwen3:8b"
+MODEL_NAME = "gpt-5-mini"
+
 EMBEDDINGS_MODEL = "bge-m3:latest"
 EMBEDDINGS_ENDPOINT = "http://localhost:11434/api/embed"
 MODEL_ENDPOINT = (
-    "http://localhost:11434/api/chat"
+    "https://ai-academy-foundry.openai.azure.com/openai/v1"
 )
 SYSTEM_PROMPT = ""
+CHUNK_SIZE = 100

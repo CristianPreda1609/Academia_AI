@@ -21,9 +21,7 @@ def main():
     print("AI Assistant started. Type 'exit' to quit.")
 
     while True:
-        user_input = input(
-            "\nYou: "
-        )
+        user_input = input("\nYou: ")
 
         if user_input.lower() == "exit":
             break
