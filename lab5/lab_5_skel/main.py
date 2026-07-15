@@ -6,12 +6,14 @@ interface for interacting with the agent.
 """
 
 from agent import Agent
+from embedding_generator import embedding_generator
 from llm_client import LLMClient
 from conversation_context import ConversationContext
 from tools.tools import tools
 
 
 def main():
+    embedding_generator()
     context = ConversationContext()
 
     llm_client = LLMClient()

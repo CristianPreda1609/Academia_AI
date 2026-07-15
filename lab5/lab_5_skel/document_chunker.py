@@ -2,10 +2,11 @@
 
 import os
 import json
+from config import CHUNK_SIZE
 
 
 def load_n_chunk_docs():
-    prompt = ""
+    chunk_dict_list = []
     files_to_read = os.listdir("knowledge")
     for file_to_read in files_to_read:
         sub_files = os.listdir(os.path.join("knowledge", file_to_read))
@@ -17,4 +18,14 @@ def load_n_chunk_docs():
                         for fact in facts:
                             if not fact.get("always_load"):
                                 with open(os.path.join("knowledge", file_to_read, fact.get("id")+'.md'), "r", encoding="utf-8") as f2:
-                                    prompt += "\n" + f2.read()
+                                    text = f2.read()
+                                    words = text.split()
+                                    for index, chunk in enumerate(range(0, len(words), CHUNK_SIZE)):
+                                        chunk_dict = {
+                                            "document_id": fact.get("id"),
+                                            "chunk_index": index,
+                                            "content": " ".join(words[chunk:chunk + CHUNK_SIZE])
+                                        }
+                                        chunk_dict_list.append(chunk_dict)
+    return chunk_dict_list
+                                   
