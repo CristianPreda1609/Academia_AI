@@ -1,6 +1,7 @@
 import requests
+import json
 
-from config import EMBEDDINGS_MODEL, EMBEDDINGS_ENDPOINT, API_KEY
+from config import EMBEDDINGS_MODEL, EMBEDDINGS_ENDPOINT, API_KEY, SIMILARITY_THRESHOLD, TOP_N
 
 
 class EmbeddingsClient:
@@ -50,5 +51,24 @@ class EmbeddingsClient:
         return dot_product / (magnitude1 * magnitude2)
     
     def semantic_search(self, user_question: str):
-        pass
-        # TODO: Implement semantic search functionality
+        question_embedding = self.get_embedding(user_question)
+        with open("embeddings.json", 'r', encoding="utf-8") as f:
+            emb_json = json.load(f)
+        
+        results_with_similarity = []
+        for item in emb_json:
+            similarity = self.cosine_similarity(question_embedding, item["embedding"])
+            results_with_similarity.append({
+                "document_id": item["document_id"],
+                "chunk_index": item["chunk_index"],
+                "similarity": similarity,
+                "content": item["content"]
+            })
+        sorted_list = sorted(
+            results_with_similarity,
+            key=lambda r: r["similarity"],
+            reverse=True
+        )
+        final_list = [item for item in sorted_list if item["similarity"] > SIMILARITY_THRESHOLD]
+
+        return final_list[:TOP_N]
