@@ -249,7 +249,7 @@ Ordinea recomandată = de la ușor la greu.
 >   opțional limitezi câte mesaje de istoric trimiți spre model.
 > - README — paragraf care explică strategia always_load + retrieval (documentarea contează).
 
-### 🟨 2.4 Context Recycling / Compression (2p) — SCHELET GATA, tu completezi TODO-urile (~1–2h)
+### ✅ 2.4 Context Recycling / Compression (2p) — SCHELET GATA, tu completezi TODO-urile (~1–2h)
 
 **Starea**: `compress_history(max_tokens, llm_client=None)` din `conversation_context.py`
 are scheletul complet scris de Claude — 7 pași comentați, cu hinturi și 3 capcane
