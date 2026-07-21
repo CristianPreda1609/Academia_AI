@@ -127,14 +127,34 @@ to your next message.
 ## Running the tests
 
 ```powershell
-pytest                                              # run the test suite
-pytest --cov=embeddings_client --cov-report=term    # with coverage
+pytest                                                       # run the test suite
+pytest --cov=embeddings_client --cov-report=term-missing     # coverage of the tested module
+pytest --cov=. --cov-report=term-missing                     # coverage of the whole project
 ```
 
-Tests live in `tests/` and cover the pure logic only (e.g.
-`EmbeddingsClient.cosine_similarity`). External services — Ollama, Azure — are
-deliberately **not** called from tests, so the suite runs offline and without an
-API key.
+Tests live in `tests/`. `pytest.ini` sets `testpaths = tests` and `pythonpath = .`,
+so the suite finds the project modules without any install step.
+
+**Scope:** the suite currently targets `embeddings_client.py` only — the retrieval
+core, which holds the most non-trivial pure logic. That module is at **100%**
+statement coverage; **project-wide coverage is ~26%**, since the agent, the HTTP
+layer and the conversation store are not unit-tested yet. `--cov=.` above prints the
+honest per-module breakdown.
+
+`tests/test_embeddings_client.py` covers `EmbeddingsClient` at **100%**:
+
+| Area | What is covered |
+|---|---|
+| `cosine_similarity` | identical, opposite, orthogonal and related vectors, plus both zero-magnitude branches |
+| `_headers` | Azure → `api-key` header; any other endpoint → `Authorization: Bearer` |
+| `get_embedding` | successful call (right model, input, timeout) and all three failure paths — connection refused, timeout, HTTP error |
+| `semantic_search` | ranking, threshold filtering, `TOP_N` cap, and graceful degradation when Ollama is down or `embeddings.json` is missing / corrupt |
+
+External services — Ollama, Azure — are deliberately **never** called: `requests.post`
+is replaced with a fake response, and `SIMILARITY_THRESHOLD`, `TOP_N` and
+`EMBEDDINGS_FILE` are patched per test (with `tmp_path` for fixtures). The suite
+therefore runs offline, without an API key, and does not depend on your `.env` or
+on the real `embeddings.json`.
 
 ---
 
@@ -387,6 +407,7 @@ A self-contained UI in `static/` (no external libraries), served by `api.py`:
 | `.env.example` | Committed template of every supported setting (copy to `.env`) |
 | `logging_config.py` | `setup_logging()` — console + `app.log`, called once per entry point |
 | `tests/` | pytest suite (`test_embeddings_client.py`) |
+| `pytest.ini` | pytest config — `testpaths`, `pythonpath` |
 | `knowledge/` | Prompts, facts, procedures + registries |
 | `tools/` | Tool definitions; `tools.py` discovers them automatically |
 | `static/` | Web UI (HTML/CSS/JS) |
@@ -426,6 +447,8 @@ live token/cost readout.
 - **Logging** — a single app-level logger (`logging_config.py`) records every user
   question, every model answer, every tool call and every error, at `INFO` / `WARNING` /
   `ERROR` (see [Logs](#logs)).
-- **Unit tests** — `tests/test_embeddings_client.py` covers `cosine_similarity`
-  (identical, opposite, orthogonal, related, and both zero-magnitude branches) for full
-  coverage; run with `pytest` (see [Running the tests](#running-the-tests)).
+- **Unit tests** — `tests/test_embeddings_client.py` holds 18 tests covering
+  `EmbeddingsClient` at **100% statement coverage**: `cosine_similarity`, header
+  selection, every `get_embedding` failure path, and `semantic_search` ranking,
+  filtering and fallbacks. No network access required — run with `pytest`
+  (see [Running the tests](#running-the-tests)).
