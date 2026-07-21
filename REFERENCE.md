@@ -225,17 +225,30 @@ EmbeddingsClient()
 ```
 
 **`get_embedding(text: str) -> list[float]`**
-Calls the Ollama embeddings endpoint and returns the vector. Raises `ConnectionError`
-with a clear message if Ollama is unreachable / times out / errors.
+Calls the embeddings endpoint (60 s timeout) and returns the vector, unwrapped from the
+`{"embeddings": [[...]]}` envelope. Raises `ConnectionError` with a clear message if the
+server is unreachable, times out, or answers with an HTTP error (the status code and the
+first 200 chars of the body are included).
 
 **`cosine_similarity(vec1, vec2) -> float`**
-Cosine similarity in `[-1, 1]` (1 = identical meaning, 0 = unrelated).
+Cosine similarity in `[-1, 1]` (1 = identical meaning, 0 = unrelated). A zero-magnitude
+vector has no direction, so it returns `0.0` rather than raising `ZeroDivisionError`.
 
 **`semantic_search(user_question: str) -> list[dict]`**
 Embeds the question, scores it against every chunk in `EMBEDDINGS_FILE`, and returns
 the chunks above `SIMILARITY_THRESHOLD`, sorted by similarity, capped at `TOP_N`.
 Each result: `{"document_id", "chunk_index", "similarity", "content"}`. Returns `[]`
-(with a printed reason) if Ollama is down or the embeddings file is missing/corrupt.
+and logs at `ERROR` if the embeddings server is down or the embeddings file is
+missing / corrupt — retrieval is skipped, the conversation continues.
+
+**`_headers() -> dict`** *(internal)*
+Builds the request headers from `EMBEDDINGS_ENDPOINT`: an `api-key` header when the
+endpoint is on `azure.com`, otherwise `Authorization: Bearer <API_KEY>`.
+
+> **Tests** — `tests/test_embeddings_client.py` covers this class at 100%, with
+> `requests.post` faked and the config constants patched per test, so nothing here is
+> exercised against a live Ollama or Azure. See
+> [README → Running the tests](README.md#running-the-tests).
 
 ---
 
